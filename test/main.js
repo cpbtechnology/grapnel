@@ -68,6 +68,15 @@
             paramNotRequired = req.params.not_required;
         });
 
+        router.get('/query/:routeparam',function(req,e){
+                    equal(req.params.routeparam,'zero');
+                    ok(req.query.zero === undefined);
+                    equal(req.query.param1,'one');
+                    equal(req.query.param2,'two');
+                    equal(req.query.param3,'');
+                    equal(req.query.param4,null);
+        });
+
         router.get('/settings/wildcard/*', function(req, e) {
             paramWildcard = req.params[0];
         });
@@ -160,6 +169,10 @@
                 equal(paramWildcard, 'test123/test456');
                 done();
             }, 30);
+        });
+        
+        test('Query parameters functions correctly',function(){
+                    router.navigate('/query/zero?param1=one&param2=two&param3=&param4');
         });
 
         test('Multiple routes can be called', function() {
