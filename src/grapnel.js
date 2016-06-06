@@ -4,7 +4,7 @@
  *
  * @author Greg Sabia Tucker <greg@bytecipher.io>
  * @link http://bytecipher.io
- * @version 0.6.4
+ * @version 0.6.5
  *
  * Released under MIT License. See LICENSE.txt or http://opensource.org/licenses/MIT
 */
@@ -20,20 +20,20 @@
         this.options = opts || {}; // Options
         this.options.env = this.options.env || (!!(Object.keys(root).length === 0 && process && process.browser !== true) ? 'server' : 'client');
         this.options.mode = this.options.mode || (!!(this.options.env !== 'server' && this.options.pushState && root.history && root.history.pushState) ? 'pushState' : 'hashchange');
-        this.version = '0.6.4'; // Version
+        this.version = '0.6.5'; // Version
 
-        if ('function' === typeof root.addEventListener) {
-            root.addEventListener('hashchange', function() {
-                self.trigger('hashchange');
-            });
+        // if ('function' === typeof root.addEventListener) {
+        //     root.addEventListener('hashchange', function() {
+        //         self.trigger('hashchange');
+        //     });
 
-            root.addEventListener('popstate', function(e) {
-                // Make sure popstate doesn't run on init -- this is a common issue with Safari and old versions of Chrome
-                if (self.state && self.state.previousState === null) return false;
+        //     root.addEventListener('popstate', function(e) {
+        //         // Make sure popstate doesn't run on init -- this is a common issue with Safari and old versions of Chrome
+        //         if (self.state && self.state.previousState === null) return false;
 
-                self.trigger('navigate');
-            });
-        }
+        //         self.trigger('navigate');
+        //     });
+        // }
 
         return this;
     };
@@ -217,19 +217,27 @@
      * @param {String} Pathname
      * @return {self} Router
      */
-    Grapnel.prototype.navigate = function(path) {
-        return this.path(path).trigger('navigate');
+    Grapnel.prototype.navigate = function(path, state) {
+        return this.path(path, state).trigger('navigate');
     };
 
-    Grapnel.prototype.path = function(pathname) {
+    Grapnel.prototype.path = function(pathname, state, title) {
         var self = this,
             frag;
+
+        if (!state || typeof state !== 'object') {
+            state = {};
+        }
+
+        if (!title) {
+            title = document.title + ' ' + pathname;
+        }
 
         if ('string' === typeof pathname) {
             // Set path
             if (self.options.mode === 'pushState') {
                 frag = (self.options.root) ? (self.options.root + pathname) : pathname;
-                root.history.pushState({}, null, frag);
+                root.history.pushState(state, title, frag);
             } else if (root.location) {
                 root.location.hash = (self.options.hashBang ? '!' : '') + pathname;
             } else {
@@ -252,7 +260,7 @@
         } else if (pathname === false) {
             // Clear path
             if (self.options.mode === 'pushState') {
-                root.history.pushState({}, null, self.options.root || '/');
+                root.history.pushState(state, title, self.options.root || '/');
             } else if (root.location) {
                 root.location.hash = (self.options.hashBang) ? '!' : '';
             }

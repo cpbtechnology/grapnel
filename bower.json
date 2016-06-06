@@ -1,6 +1,6 @@
 {
   "name": "grapnel",
-  "version": "0.6.4",
+  "version": "0.6.5",
   "homepage": "https://github.com/bytecipher/grapnel",
   "authors": [
     "Greg Sabia Tucker <greg@bytecipher.io>"
@@ -34,5 +34,8 @@
     "bower_components",
     "test",
     "tests"
-  ]
+  ],
+  "dependencies": {
+    "grapnel": "git+https://github.com/cpbtechnology/grapnel.git#^0.6.4"
+  }
 }
